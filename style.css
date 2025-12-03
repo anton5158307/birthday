@@ -1,0 +1,313 @@
+/* Общие стили */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body,
+html {
+  height: 100%;
+  width: 100%;
+  font-family: "Arial", sans-serif;
+  background: linear-gradient(135deg, #ffafbd, #ffc3a0);
+  /* УБРАТЬ overflow: hidden; чтобы можно было скроллить */
+  color: #6d2c5d;
+  text-align: center;
+  position: relative;
+}
+
+/* КОНТЕЙНЕР ДЛЯ ВСЕХ СЕРДЕЧЕК - ФОН */
+#hearts-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Стили для PNG сердечек */
+.heart {
+  position: absolute;
+  background-image: url("images/heart.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* АНИМАЦИЯ ДЛЯ УЛЕТАЮЩИХ СЕРДЕЧЕК */
+@keyframes float-up-heart {
+  0% {
+    transform: translateY(var(--start-y)) translateX(var(--start-x))
+      scale(var(--start-scale)) rotate(0deg);
+    opacity: var(--start-opacity);
+  }
+  20% {
+    opacity: calc(var(--start-opacity) + 0.2);
+    transform: translateY(calc(var(--start-y) - 20vh))
+      translateX(var(--start-x)) scale(1) rotate(90deg);
+  }
+  50% {
+    opacity: var(--start-opacity);
+    transform: translateY(calc(var(--start-y) - 50vh))
+      translateX(calc(var(--start-x) + var(--drift-x))) scale(0.9)
+      rotate(180deg);
+  }
+  80% {
+    opacity: calc(var(--start-opacity) - 0.4);
+    transform: translateY(calc(var(--start-y) - 80vh))
+      translateX(calc(var(--start-x) + calc(var(--drift-x) * 0.5))) scale(0.7)
+      rotate(270deg);
+  }
+  100% {
+    transform: translateY(calc(var(--start-y) - 100vh))
+      translateX(calc(var(--start-x) + var(--drift-x))) scale(0.5)
+      rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Ускоренная анимация для быстрого улетания */
+@keyframes float-up-fast {
+  0% {
+    transform: translateY(100vh) translateX(0) scale(0.8) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-100px) translateX(var(--drift-x)) scale(0.6)
+      rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Анимация для взрыва сердечек */
+@keyframes heartBurst {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+    transform: translate(
+        calc(var(--translate-x) * 0.5),
+        calc(var(--translate-y) * 0.5)
+      )
+      rotate(180deg) scale(1.2);
+  }
+  100% {
+    transform: translate(var(--translate-x), var(--translate-y)) rotate(360deg)
+      scale(0);
+    opacity: 0;
+  }
+}
+
+/* Кнопка вверху страницы */
+.top-heart-button {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  padding: 12px 25px;
+  font-size: 1.1em;
+  background-color: #ff6b8b;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  animation: floatUpDown 3s ease-in-out infinite;
+}
+
+.top-heart-button:hover {
+  background-color: #ff4d6d;
+  transform: translateX(-50%) scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes floatUpDown {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-8px);
+  }
+}
+
+/* Экранные контейнеры */
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease-in-out;
+  z-index: 10;
+  padding-top: 80px;
+}
+
+.screen.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.instruction {
+  margin-top: 120px;
+  font-size: 1.3em;
+  color: #6d2c5d;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+  margin-bottom: 40px;
+}
+
+/* Основные кнопки */
+button {
+  padding: 16px 35px;
+  font-size: 1.3em;
+  cursor: pointer;
+  background-color: #ff6b8b;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  position: absolute;
+  opacity: 1;
+  z-index: 20;
+}
+
+button:hover {
+  background-color: #ff4d6d;
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Анимация биения сердца для первой кнопки */
+.heartbeat-button {
+  animation: heartbeat 1.5s ease-in-out infinite both;
+  position: relative;
+}
+
+@keyframes heartbeat {
+  from {
+    transform: scale(1);
+  }
+  5% {
+    transform: scale(1.2);
+  }
+  10% {
+    transform: scale(1.1);
+  }
+  15% {
+    transform: scale(1.3);
+  }
+  50% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Анимации появления/исчезновения кнопок */
+.fade-in-button {
+  animation: fadeInScale 0.5s ease-out forwards;
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.fade-out-button {
+  animation: fadeOutScale 0.5s ease-in forwards;
+}
+
+@keyframes fadeOutScale {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .top-heart-button {
+    font-size: 0.9em;
+    padding: 10px 20px;
+    top: 15px;
+  }
+
+  h1 {
+    font-size: 1.8em;
+    padding: 0 15px;
+  }
+
+  .instruction {
+    font-size: 1.1em;
+    padding: 0 20px;
+    margin-top: 100px;
+  }
+
+  button {
+    padding: 14px 28px;
+    font-size: 1.1em;
+  }
+
+  .heart {
+    width: 25px;
+    height: 25px;
+  }
+}
+
+/* Плавное появление страницы */
+body {
+  animation: pageFadeIn 1.5s ease-out;
+}
+
+@keyframes pageFadeIn {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
+}

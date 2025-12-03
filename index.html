@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для моей любимой ❤️</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Кнопка вверху страницы -->
+    <button class="top-heart-button" onclick="playHeartSound()">
+        💖 С твоим днем! 💖
+    </button>
+
+    <!-- Контейнер для анимированных сердечек -->
+    <div id="hearts-container"></div>
+
+    <!-- Главный экран с первой кнопкой -->
+    <div id="start-screen" class="screen active">
+        <h1>С днем рождения, моя любимая ✨</h1>
+        <p class="instruction">тап тап</p>
+        <button class="heartbeat-button" onclick="showNextButton(1)">Начать игру</button>
+    </div>
+
+    <!-- Контейнер для появляющихся кнопок -->
+    <div id="buttons-container"></div>
+
+    <!-- Аудио для звука сердца -->
+    <audio id="heart-sound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-heartbeat-1214.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио.
+    </audio>
+
+    <script>
+        // ГЛАВНАЯ ФУНКЦИЯ: СОЗДАЁМ МНОЖЕСТВО СЕРДЕЧЕК, КОТОРЫЕ СРАЗУ УЛЕТАЮТ
+        function createFlyingHearts() {
+            const container = document.getElementById('hearts-container');
+            if (!container) {
+                console.error('Контейнер для сердечек не найден!');
+                return;
+            }
+            
+            console.log('Создаём летающие сердечки...');
+            
+            // КОЛИЧЕСТВО СЕРДЕЧЕК (можно увеличить)
+            const heartCount = 60;
+            
+            // СОЗДАЁМ СЕРДЕЧКИ, КОТОРЫЕ СРАЗУ УЛЕТАЮТ
+            for (let i = 0; i < heartCount; i++) {
+                createFlyingHeart(container, i);
+            }
+            
+            console.log(`Создано ${heartCount} летающих сердечек`);
+            
+            // ЗАПУСКАЕМ ПОСТОЯННОЕ СОЗДАНИЕ НОВЫХ СЕРДЕЧЕК
+            startContinuousHearts();
+        }
+        
+        // Функция создания одного улетающего сердечка
+        function createFlyingHeart(container, index) {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            
+            // Случайный размер (15-50px)
+            const size = 15 + Math.random() * 35;
+            heart.style.width = size + 'px';
+            heart.style.height = size + 'px';
+            
+            // Случайная начальная позиция (по всей высоте страницы)
+            const startX = Math.random() * 100; // 0-100%
+            const startY = 20 + Math.random() * 80; // 20-100% (не слишком высоко)
+            
+            heart.style.setProperty('--start-x', startX + 'vw');
+            heart.style.setProperty('--start-y', startY + 'vh');
+            
+            // Случайный дрейф по горизонтали
+            const driftX = (Math.random() - 0.5) * 100;
+            heart.style.setProperty('--drift-x', driftX + 'px');
+            
+            // Случайный начальный размер
+            const startScale = 0.6 + Math.random() * 0.4;
+            heart.style.setProperty('--start-scale', startScale);
+            
+            // Случайная начальная прозрачность
+            const startOpacity = 0.5 + Math.random() * 0.5;
+            heart.style.setProperty('--start-opacity', startOpacity);
+            heart.style.opacity = startOpacity;
+            
+            // Случайная длительность анимации (5-15 секунд)
+            const duration = 5 + Math.random() * 10;
+            
+            // Случайная задержка перед стартом (0-3 секунды)
+            const delay = Math.random() * 3;
+            
+            // Запускаем анимацию улетания
+            heart.style.animation = `float-up-heart ${duration}s ease-in-out ${delay}s forwards`;
+            
+            container.appendChild(heart);
+            
+            // Удаляем сердечко после завершения анимации
+            setTimeout(() => {
+                if (heart.parentNode === container) {
+                    heart.remove();
+                }
+            }, (duration + delay) * 1000);
+            
+            return heart;
+        }
+        
+        // Функция для создания сердечек, которые поднимаются снизу
+        function createRisingHeart() {
+            const container = document.getElementById('hearts-container');
+            
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            
+            // Случайный размер
+            const size = 20 + Math.random() * 40;
+            heart.style.width = size + 'px';
+            heart.style.height = size + 'px';
+            
+            // Начинаем снизу экрана
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.top = '100%';
+            
+            // Случайный дрейф
+            const driftX = (Math.random() - 0.5) * 80;
+            heart.style.setProperty('--drift-x', driftX + 'px');
+            
+            // Анимация подъёма
+            const duration = 8 + Math.random() * 12;
+            heart.style.animation = `float-up-fast ${duration}s linear forwards`;
+            
+            // Случайная прозрачность
+            heart.style.opacity = 0.7 + Math.random() * 0.3;
+            
+            container.appendChild(heart);
+            
+            // Удаляем после анимации
+            setTimeout(() => {
+                if (heart.parentNode) heart.remove();
+            }, duration * 1000);
+        }
+        
+        // Запускаем постоянное создание новых сердечек
+        function startContinuousHearts() {
+            // Создаём сердечки снизу каждые 2-5 секунд
+            setInterval(() => {
+                // Создаём 1-3 сердечка за раз
+                const count = 1 + Math.floor(Math.random() * 3);
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        createRisingHeart();
+                    }, i * 300);
+                }
+            }, 2000 + Math.random() * 3000);
+            
+            // Периодически создаём взрыв сердечек
+            setInterval(() => {
+                createRandomHeartBurst();
+            }, 8000 + Math.random() * 7000);
+        }
+        
+        // Случайный взрыв сердечек в разных местах
+        function createRandomHeartBurst() {
+            const container = document.getElementById('hearts-container');
+            const x = Math.random() * 80 + 10; // 10-90%
+            const y = Math.random() * 80 + 10; // 10-90%
+            
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart';
+                    
+                    heart.style.left = x + '%';
+                    heart.style.top = y + '%';
+                    
+                    const size = 15 + Math.random() * 25;
+                    heart.style.width = size + 'px';
+                    heart.style.height = size + 'px';
+                    
+                    const angle = Math.random() * 2 * Math.PI;
+                    const distance = 40 + Math.random() * 60;
+                    const translateX = Math.cos(angle) * distance;
+                    const translateY = Math.sin(angle) * distance;
+                    
+                    heart.style.animation = `heartBurst 1.5s ease-out forwards`;
+                    heart.style.setProperty('--translate-x', translateX + 'px');
+                    heart.style.setProperty('--translate-y', translateY + 'px');
+                    
+                    container.appendChild(heart);
+                    
+                    setTimeout(() => {
+                        if (heart.parentNode) heart.remove();
+                    }, 1500);
+                }, i * 50);
+            }
+        }
+        
+        // Функция для создания взрыва сердечек вокруг кнопки
+        function createHeartBurst() {
+            const button = document.querySelector('.top-heart-button');
+            const container = document.getElementById('hearts-container');
+            
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                
+                // Позиция рядом с кнопкой
+                const rect = button.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                heart.style.left = (centerX - 20) + 'px';
+                heart.style.top = (centerY - 20) + 'px';
+                
+                // Размер
+                const size = 20 + Math.random() * 30;
+                heart.style.width = size + 'px';
+                heart.style.height = size + 'px';
+                
+                // Разлет
+                const angle = Math.random() * 2 * Math.PI;
+                const distance = 50 + Math.random() * 100;
+                const translateX = Math.cos(angle) * distance;
+                const translateY = Math.sin(angle) * distance;
+                
+                // Анимация взрыва
+                heart.style.animation = `heartBurst 1.5s ease-out forwards`;
+                heart.style.setProperty('--translate-x', translateX + 'px');
+                heart.style.setProperty('--translate-y', translateY + 'px');
+                
+                container.appendChild(heart);
+                
+                // Удаляем через 1.5 секунды
+                setTimeout(() => {
+                    if (heart.parentNode) heart.remove();
+                }, 1500);
+            }
+            
+            // Добавляем несколько улетающих сердечек
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createFlyingHeart(container, 1000 + i);
+                }, i * 200);
+            }
+        }
+        
+        // Функция для воспроизведения звука сердца
+        function playHeartSound() {
+            const heartSound = document.getElementById('heart-sound');
+            if (heartSound) {
+                heartSound.currentTime = 0;
+                heartSound.play().catch(e => {
+                    console.log("Автовоспроизведение звука заблокировано");
+                });
+            }
+            
+            // Создаем взрыв сердечек
+            createHeartBurst();
+        }
+        
+        // ЗАПУСК ВСЕГО ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+        window.addEventListener('load', function() {
+            console.log('Страница загружена! Запускаем летающие сердечки...');
+            
+            // 1. Создаём множество сердечек, которые сразу улетают
+            createFlyingHearts();
+            
+            // 2. Добавляем обработчик для игровых кнопок
+            document.addEventListener('click', function(e) {
+                if (e.target.tagName === 'BUTTON' && e.target.innerText === 'Нажми на меня') {
+                    createButtonHearts(e.target);
+                }
+            });
+            
+            // 3. Тестовый взрыв для проверки
+            setTimeout(() => {
+                createTestBurst();
+            }, 1000);
+        });
+        
+        // Функция для создания сердечек вокруг игровых кнопок
+        function createButtonHearts(button) {
+            const container = document.getElementById('hearts-container');
+            
+            for (let i = 0; i < 12; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                
+                const rect = button.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                heart.style.left = (centerX - 15) + 'px';
+                heart.style.top = (centerY - 15) + 'px';
+                
+                const angle = Math.random() * 2 * Math.PI;
+                const distance = 30 + Math.random() * 60;
+                const translateX = Math.cos(angle) * distance;
+                const translateY = Math.sin(angle) * distance;
+                
+                const size = 15 + Math.random() * 25;
+                heart.style.width = size + 'px';
+                heart.style.height = size + 'px';
+                
+                heart.style.animation = `heartBurst 1.2s ease-out forwards`;
+                heart.style.setProperty('--translate-x', translateX + 'px');
+                heart.style.setProperty('--translate-y', translateY + 'px');
+                
+                container.appendChild(heart);
+                
+                setTimeout(() => {
+                    if (heart.parentNode) heart.remove();
+                }, 1200);
+            }
+        }
+        
+        // Тестовый взрыв для проверки работы
+        function createTestBurst() {
+            const container = document.getElementById('hearts-container');
+            console.log('Тестовый взрыв сердечек - проверка работы');
+            
+            for (let i = 0; i < 10; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                
+                // В центре экрана
+                heart.style.left = '50%';
+                heart.style.top = '50%';
+                heart.style.transform = 'translate(-50%, -50%)';
+                
+                const size = 40 + Math.random() * 40;
+                heart.style.width = size + 'px';
+                heart.style.height = size + 'px';
+                
+                const angle = Math.random() * 2 * Math.PI;
+                const distance = 60 + Math.random() * 90;
+                const translateX = Math.cos(angle) * distance;
+                const translateY = Math.sin(angle) * distance;
+                
+                heart.style.animation = `heartBurst 2s ease-out forwards`;
+                heart.style.setProperty('--translate-x', translateX + 'px');
+                heart.style.setProperty('--translate-y', translateY + 'px');
+                
+                container.appendChild(heart);
+                
+                setTimeout(() => {
+                    if (heart.parentNode) heart.remove();
+                }, 2000);
+            }
+        }
+        
+        // Функция для создания сердечек в указанном месте
+        function createHeartsAt(x, y, count = 10) {
+            const container = document.getElementById('hearts-container');
+            
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart';
+                    
+                    heart.style.left = x + 'px';
+                    heart.style.top = y + 'px';
+                    
+                    const size = 15 + Math.random() * 25;
+                    heart.style.width = size + 'px';
+                    heart.style.height = size + 'px';
+                    
+                    const angle = Math.random() * 2 * Math.PI;
+                    const distance = 30 + Math.random() * 70;
+                    const translateX = Math.cos(angle) * distance;
+                    const translateY = Math.sin(angle) * distance;
+                    
+                    heart.style.animation = `heartBurst 1s ease-out forwards`;
+                    heart.style.setProperty('--translate-x', translateX + 'px');
+                    heart.style.setProperty('--translate-y', translateY + 'px');
+                    
+                    container.appendChild(heart);
+                    
+                    setTimeout(() => {
+                        if (heart.parentNode) heart.remove();
+                    }, 1000);
+                }, i * 50);
+            }
+        }
+    </script>
+    
+    <!-- Подключаем основной скрипт с игровой логикой -->
+    <script src="script.js"></script>
+</body>
+</html>

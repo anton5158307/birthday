@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поздравление для моей любимой 💝</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Дополнительные стили для страницы поздравления */
+        body, html {
+            overflow-x: hidden; /* Только горизонтальный скролл запрещаем */
+            overflow-y: auto; /* Вертикальный скролл разрешаем */
+            min-height: 100vh;
+        }
+        
+        .congratulations-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 20;
+            min-height: 100vh;
+            padding-bottom: 100px; /* Отступ снизу для скролла */
+        }
+
+        .love-message {
+            font-size: 1.3em;
+            line-height: 1.6;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .special-date {
+            font-style: italic;
+            color: #8a2be2;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        #fireworks-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .firework {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .memory-section {
+            margin: 30px 0;
+        }
+
+        .memory-title {
+            font-size: 1.4em;
+            color: #ff6b8b;
+            margin-bottom: 15px;
+        }
+
+        /* Улучшенные стили для фейерверков */
+        .firework-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Стили для модального окна */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 10px;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .close:hover {
+            color: #ff6b8b;
+        }
+        
+        /* Галерея фотографий */
+        #photo-gallery {
+            margin: 30px 0;
+        }
+        
+        .gallery-title {
+            font-size: 1.4em;
+            color: #ff6b8b;
+            margin-bottom: 20px;
+        }
+        
+        .gallery-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .gallery-item {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            margin: 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            border: 3px solid #ff6b8b;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Кнопки управления */
+        .controls {
+            margin: 40px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .controls button {
+            position: relative;
+            padding: 14px 28px;
+            font-size: 1.1em;
+            margin: 5px;
+            z-index: 30;
+        }
+        
+        /* Инструкция */
+        .photo-instruction {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        /* Сообщение, когда нет фото */
+        .no-photos {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1em;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        /* Контейнер экрана - исправляем для скролла */
+        .screen {
+            position: relative; /* Меняем с absolute на relative */
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Меняем с center на flex-start */
+            align-items: center;
+            opacity: 1; /* Убираем анимацию появления */
+            pointer-events: all;
+            z-index: 10;
+            padding-top: 100px; /* Отступ сверху для кнопки */
+        }
+        
+        .screen.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        /* Адаптивность для мобильных */
+        @media (max-width: 768px) {
+            .congratulations-container {
+                padding: 15px;
+                padding-bottom: 80px;
+            }
+            
+            .gallery-item {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .controls button {
+                width: 90%;
+                max-width: 300px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Контейнер для фейерверков и сердец -->
+    <div id="fireworks-container"></div>
+
+    <!-- Основной контент поздравления -->
+    <div class="screen active">
+        <div class="congratulations-container">
+            <h1>🎉 С Днём Рождения, моя любимая! 🎉</h1>
+            
+            <div class="love-message">
+                <p>ПОЛИННААА,</p>
+                
+                <p>Поздравляю тебя с этим прекрасным днём! Ты - самое яркое и прекрасное, что случилось в моей жизни. 💖</p>
+                
+                <p class="special-date">С того дня, как мы встретились, каждый момент стал особенным</p>
+                
+                <div class="memory-section">
+                    <div class="memory-title">я тебя люблю</div>
+                    <!-- <ul style="text-align: left; display: inline-block;">
+                        <li>Наша первая встреча</li>
+                        <li>Совместные путешествия</li>
+                        <li>Вечерние прогулки</li>
+                        <li>Смех до слёз</li>
+                        <li>Поддержка в трудные минуты</li>
+                    </ul> -->
+                </div>
+
+                <p>Я бесконечно благодарен судьбе за то, что ты в моей жизни. Ты делаешь меня лучше каждый день. 🌟</p>
+                
+                <p>Люблю тебя больше жизни! 💕</p>
+                
+            
+            </div>
+
+            <!-- Галерея фотографий -->
+            <div id="photo-gallery">
+                <div class="gallery-title">Наши воспоминания 📸</div>
+                
+                <div class="gallery-grid" id="gallery-grid">
+                    <!-- Фотографии будут добавлены JavaScript -->
+                </div>
+            </div>
+
+            <div class="controls">
+                <button onclick="createMassiveFireworks()">фейерверк ебнуть</button>
+                <button onclick="showHeartsStorm()">салютик из сердец</button>
+                <button onclick="createRomanticHearts()">дождик из сердечек</button>
+                
+            </div>
+            
+            <!-- Декоративный элемент внизу -->
+            <div style="margin-top: 50px; padding: 20px; color: #ff6b8b; font-size: 1.2em;">
+                Я тебя люблю ❤️
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для просмотра фото -->
+    <div id="modal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modal-img">
+    </div>
+
+    <script>
+        // Массив с путями к фотографиям
+        const photoPaths = [
+            'images/photos/photo1.jpg',
+            'images/photos/photo2.jpg', 
+            'images/photos/photo3.jpg',
+            'images/photos/photo4.jpg',
+            'images/photos/photo5.jpg'
+        ];
+        
+        // Функция для загрузки фотографий из папки
+        function loadPhotos() {
+            const galleryGrid = document.getElementById('gallery-grid');
+            galleryGrid.innerHTML = '<div style="color:#ff6b8b; padding:30px; font-size:1.1em;">🔍 Ищем фотографии...</div>';
+            
+            const loadedPhotos = [];
+            let loadedCount = 0;
+            
+            // Пробуем загрузить фотографии
+            photoPaths.forEach((path, index) => {
+                const img = new Image();
+                img.onload = function() {
+                    loadedPhotos.push({
+                        path: path,
+                        element: img
+                    });
+                    loadedCount++;
+                    if (loadedCount === photoPaths.length) {
+                        displayPhotos(loadedPhotos);
+                    }
+                };
+                img.onerror = function() {
+                    loadedCount++;
+                    if (loadedCount === photoPaths.length) {
+                        displayPhotos(loadedPhotos);
+                    }
+                };
+                img.src = path;
+            });
+            
+            // Если не нашли фото через 3 секунды
+            setTimeout(() => {
+                if (loadedPhotos.length === 0) {
+                    showNoPhotosMessage();
+                }
+            }, 3000);
+        }
+        
+        // Сообщение, когда фото не найдены
+        function showNoPhotosMessage() {
+            const galleryGrid = document.getElementById('gallery-grid');
+            galleryGrid.innerHTML = `
+                <div class="no-photos">
+                    <div style="font-size:1.3em; margin-bottom:15px; color:#ff6b8b;">📷 Фотографии не найдены</div>
+                    <div style="margin-bottom:10px;">Чтобы добавить фотографии:</div>
+                    <div style="text-align:left; display:inline-block; background:rgba(255,255,255,0.3); padding:15px; border-radius:10px; margin-top:10px;">
+                        1. Создайте папку <strong>photos</strong> в папке <strong>images</strong><br>
+                        2. Добавьте фотографии с именами:<br>
+                        &nbsp;&nbsp;&nbsp;- photo1.jpg<br>
+                        &nbsp;&nbsp;&nbsp;- photo2.jpg<br>
+                        &nbsp;&nbsp;&nbsp;- photo3.jpg и т.д.<br>
+                        3. Нажмите кнопку "Обновить фотографии"
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Функция для отображения фотографий в галерее
+        function displayPhotos(photos) {
+            const galleryGrid = document.getElementById('gallery-grid');
+            
+            if (photos.length === 0) {
+                showNoPhotosMessage();
+                return;
+            }
+            
+            galleryGrid.innerHTML = '';
+            
+            photos.forEach(photo => {
+                const img = document.createElement('img');
+                img.className = 'gallery-item';
+                img.src = photo.element.src;
+                img.alt = 'Наше фото';
+                img.onclick = () => openModal(img);
+                img.loading = 'lazy'; // Ленивая загрузка для оптимизации
+                
+                galleryGrid.appendChild(img);
+            });
+            
+            // Создаем сердечки для каждой фотографии
+            setTimeout(() => {
+                for (let i = 0; i < Math.min(photos.length, 5); i++) {
+                    setTimeout(() => createSingleHeart(), i * 300);
+                }
+            }, 500);
+            
+            console.log(`Загружено ${photos.length} фотографий`);
+        }
+        
+        // Функция для открытия модального окна с фото
+        function openModal(img) {
+            const modal = document.getElementById('modal');
+            const modalImg = document.getElementById('modal-img');
+            modal.style.display = 'block';
+            modalImg.src = img.src;
+            
+            // Создаем сердечки вокруг открытой фотографии
+            createHeartBurstAt(img);
+            
+            // Блокируем скролл при открытом модальном окне
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Функция для закрытия модального окна
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+            // Восстанавливаем скролл
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Создание сердечек вокруг фотографии
+        function createHeartBurstAt(element) {
+            const rect = element.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            for (let i = 0; i < 12; i++) {
+                setTimeout(() => {
+                    createSingleHeartAt(centerX, centerY);
+                }, i * 100);
+            }
+        }
+        
+        // Функция для создания одного сердечка
+        function createSingleHeart() {
+            const container = document.getElementById('fireworks-container');
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            
+            // Случайная позиция
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.top = '100vh';
+            
+            // Случайный размер
+            const size = 20 + Math.random() * 40;
+            heart.style.width = size + 'px';
+            heart.style.height = size + 'px';
+            
+            // Анимация подъема
+            const duration = 3 + Math.random() * 4;
+            heart.style.animation = `float-up ${duration}s ease-out forwards`;
+            
+            container.appendChild(heart);
+            
+            setTimeout(() => {
+                if (heart.parentNode) heart.remove();
+            }, duration * 1000);
+        }
+        
+        // Функция для создания сердечка в определенной позиции
+        function createSingleHeartAt(x, y) {
+            const container = document.getElementById('fireworks-container');
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            
+            heart.style.left = x + 'px';
+            heart.style.top = y + 'px';
+            
+            // Размер
+            const size = 15 + Math.random() * 25;
+            heart.style.width = size + 'px';
+            heart.style.height = size + 'px';
+            
+            // Анимация разлета
+            const angle = Math.random() * 2 * Math.PI;
+            const distance = 30 + Math.random() * 70;
+            const translateX = Math.cos(angle) * distance;
+            const translateY = Math.sin(angle) * distance;
+            
+            heart.style.animation = `heartBurst 1.5s ease-out forwards`;
+            heart.style.setProperty('--translate-x', translateX + 'px');
+            heart.style.setProperty('--translate-y', translateY + 'px');
+            
+            container.appendChild(heart);
+            
+            setTimeout(() => {
+                if (heart.parentNode) heart.remove();
+            }, 1500);
+        }
+        
+        // УЛУЧШЕННАЯ функция для создания МАССИВНЫХ фейерверков
+        function createMassiveFireworks() {
+            const container = document.getElementById('fireworks-container');
+            const colors = ['#ff6b8b', '#ff8e53', '#6b8bff', '#8bff6b', '#ff6bd0', '#ffeb3b', '#e91e63', '#9c27b0', '#3f51b5', '#00bcd4'];
+            
+            // Создаем фейерверки
+            for (let i = 0; i < 12; i++) {
+                setTimeout(() => {
+                    createSingleFirework(container, colors);
+                }, i * 200);
+            }
+        }
+
+        // Функция для создания одного фейерверка
+        function createSingleFirework(container, colors) {
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            
+            // Случайная позиция
+            firework.style.left = Math.random() * 85 + 5 + '%';
+            firework.style.top = Math.random() * 85 + 5 + '%';
+            
+            const mainColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Создаем частицы
+            for (let j = 0; j < 20; j++) {
+                const particle = document.createElement('div');
+                particle.className = 'firework-particle';
+                particle.style.backgroundColor = mainColor;
+                
+                // Случайный размер
+                const size = 4 + Math.random() * 4;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                
+                const angle = (j / 20) * 2 * Math.PI;
+                const distance = 40 + Math.random() * 60;
+                
+                particle.style.animation = `fireworkParticle 1.5s ease-out forwards`;
+                particle.style.setProperty('--end-x', Math.cos(angle) * distance + 'px');
+                particle.style.setProperty('--end-y', Math.sin(angle) * distance + 'px');
+                
+                firework.appendChild(particle);
+            }
+            
+            container.appendChild(firework);
+            
+            // Удаляем фейерверк после анимации
+            setTimeout(() => {
+                if (firework.parentNode) {
+                    firework.remove();
+                }
+            }, 1500);
+        }
+
+        // УЛУЧШЕННАЯ функция для романтических сердечек
+        function createRomanticHearts() {
+            const container = document.getElementById('fireworks-container');
+            
+            // Создаем сердечки
+            for (let i = 0; i < 35; i++) {
+                setTimeout(() => {
+                    createSingleHeart();
+                }, i * 150);
+            }
+        }
+
+        // Функция для сердечного салюта
+        function showHeartsStorm() {
+            const container = document.getElementById('fireworks-container');
+            
+            // Создаем сердечки
+            for (let i = 0; i < 60; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart';
+                    
+                    // Старт из центра
+                    heart.style.left = '50%';
+                    heart.style.top = '50%';
+                    
+                    const animationDuration = 1.5 + Math.random() * 2;
+                    const translateX = (Math.random() - 0.5) * 300;
+                    const translateY = (Math.random() - 0.5) * 300;
+                    
+                    heart.style.animation = `heartBurst ${animationDuration}s ease-out ${Math.random() * 0.3}s both`;
+                    heart.style.setProperty('--translate-x', translateX + 'px');
+                    heart.style.setProperty('--translate-y', translateY + 'px');
+                    
+                    const size = 12 + Math.random() * 25;
+                    heart.style.width = size + 'px';
+                    heart.style.height = size + 'px';
+                    
+                    container.appendChild(heart);
+                    
+                    setTimeout(() => {
+                        if (heart.parentNode) {
+                            heart.remove();
+                        }
+                    }, 2000);
+                }, i * 30);
+            }
+        }
+
+        // Добавляем стили для анимации
+        const fireworkStyles = document.createElement('style');
+        fireworkStyles.textContent = `
+            @keyframes fireworkParticle {
+                0% {
+                    transform: translate(0, 0) scale(1);
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.8;
+                }
+                100% {
+                    transform: translate(var(--end-x), var(--end-y)) scale(0);
+                    opacity: 0;
+                }
+            }
+            
+            @keyframes float-up {
+                0% {
+                    transform: translateY(0) translateX(0) scale(1) rotate(0deg);
+                    opacity: 0;
+                }
+                10% {
+                    opacity: 0.9;
+                }
+                90% {
+                    opacity: 0.4;
+                }
+                100% {
+                    transform: translateY(-100vh) translateX(var(--drift-x, 0)) scale(0.6) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(fireworkStyles);
+
+        // Автоматический запуск при загрузке страницы
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('Страница загружена, загружаем фотографии...');
+            
+            // Загружаем фотографии из папки
+            loadPhotos();
+            
+            // Автоматические фейерверки
+            setTimeout(createMassiveFireworks, 1000);
+            setInterval(createMassiveFireworks, 10000);
+            
+            // Случайные сердечные салюты
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    showHeartsStorm();
+                }
+            }, 8000);
+            
+            // Плавно скроллим к началу при загрузке
+            setTimeout(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 100);
+        });
+        
+        // Обработчик для закрытия модального окна по клавише ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        // Обработчик для закрытия модального окна по клику вне изображения
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
